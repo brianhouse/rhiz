@@ -7,11 +7,12 @@ _names = "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"
 
 class Note():
 
-    def __init__(self, name, n, accent=False, ghost=False):
+    def __init__(self, name, n, accent=False, ghost=False, off=False):
         self.name = name
         self.n = n
         self.accent = accent
         self.ghost = ghost
+        self.off = off
 
     def __pos__(self):
         return globals()[f"{self.name}_ACCENT"]
@@ -19,14 +20,20 @@ class Note():
     def __neg__(self):
         return globals()[f"{self.name}_GHOST"]
 
+    def __invert__(self):
+        return globals()[f"{self.name}_OFF"]
+
     def __repr__(self):
         return (self.name if not self.ghost else f"-{self.name}") if not self.accent else f"+{self.name}"
 
     def play(self, channel):
         if self.n < 0:
             return
-        velocity = 1. - config['accent'] + (self.accent * config['accent']) - (self.ghost * config['ghost'])
-        velocity -= random() * config['variance']
+        if self.off:
+            velocity = 0
+        else:
+            velocity = 1. - config['accent'] + (self.accent * config['accent']) - (self.ghost * config['ghost'])
+            velocity -= random() * config['variance']
         midi_out.send_note(channel, self.n, int(velocity * 127))
 
 
@@ -35,6 +42,7 @@ for n in range(0, 128):
     globals()[name] = Note(name, n)
     globals()[name + "_ACCENT"] = Note(name, n, accent=True)
     globals()[name + "_GHOST"] = Note(name, n, ghost=True)
+    globals()[name + "_OFF"] = Note(name, n, off=True)
 
 
 _ = Note("_", -1)

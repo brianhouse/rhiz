@@ -1,7 +1,7 @@
-midi_out: "M4"
-midi_in: "M4"
+midi_out: null
+midi_in: null
 throttle: 0
-send_note_offs: True
+send_note_offs: False
 log_midi: True
 
 accent: .3
