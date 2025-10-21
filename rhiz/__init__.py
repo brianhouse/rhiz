@@ -10,10 +10,12 @@ class Player():
         self.stems = []
         self.rate = 1.0
 
-    def _play(self, channel, pattern, cycles=True, rate=1.0, micro=None):
-        self.stems.append(Stem(channel, pattern, cycles, rate, micro))
+    def _add(self, *pattern, rate=1.0, phase=None):
+        stem = Stem(pattern, rate, phase)
+        self.stems.append(stem)
+        return stem
 
-    def _sync(self):
+    def _play(self):
         start_t = time.perf_counter()
         previous_t = 0.0
         try:
@@ -39,12 +41,12 @@ class Player():
 
 class Stem():
 
-    def __init__(self, channel, pattern, cycles, rate=1.0, micro=None):
-        self._channel = channel
+    def __init__(self, pattern, rate=1.0, phase=None):
         self._pattern = Pattern(pattern)
-        self.cycles = cycles
+        self._channel = 1
+        self._repeat = 1
         self._rate = rate
-        self._micro = micro
+        self._phase = phase
         self._cycles = 0
         self._index = -1
         self._last_edge = 0
@@ -52,11 +54,11 @@ class Stem():
 
     def update(self, delta_t):
         self._cycles += delta_t * self._rate * _player.rate
-        if self._cycles >= self.cycles:
+        if self._cycles >= self._repeat:
             return True
         pos = self._cycles % 1.0
-        if self._micro is not None:
-            pos = self._micro(pos)
+        if self._phase is not None:
+            pos = self._phase(pos)
         i = int(pos * len(self._steps))
         if i != self._index or (len(self._steps) == 1 and int(self._cycles) != self._last_edge):  # contingency for whole notes
             self._index = (self._index + 1) % len(self._steps)  # dont skip steps
@@ -80,13 +82,23 @@ class Stem():
             elif isinstance(step, dict):
                 pass
             else:
-                raise Exception("Got an unexpected step")
+                raise Exception(f"Got an unexpected step ({step})")
+
+    def __mul__(self, repeat):
+        assert isinstance(repeat, int)
+        self._repeat = repeat
+        return self
+
+    def __rshift__(self, channel):
+        assert isinstance(channel, int) and channel > 0 and channel < 16
+        self._channel = channel
+        return self
 
 
 _player = Player()
 play = _player._play
-sync = _player._sync
 stop = _player._stop
+P = _player._add
 
 
 def tempo(value=False):
