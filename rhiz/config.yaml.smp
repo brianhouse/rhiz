@@ -1,0 +1,9 @@
+midi_out: "M4"
+midi_in: "M4"
+throttle: 0
+send_note_offs: True
+log_midi: True
+
+accent: .3
+ghost: .2
+variance: .1
