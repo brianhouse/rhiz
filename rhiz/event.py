@@ -41,8 +41,8 @@ class Control():
         self.control = control
         self.value = value
 
-    def play(self, channel):
-        midi_out.send_control(channel, self.control, self.value)
+    def send(self, channel, value):
+        midi_out.send_control(channel, self.control, int(value))
 
     def __repr__(self):
         return f"{self.control}:{self.value}"

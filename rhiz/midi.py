@@ -63,60 +63,60 @@ class MidiOut(threading.Thread):
                 time.sleep(self.throttle)
 
 
-class MidiIn(threading.Thread):
+# class MidiIn(threading.Thread):
 
-    def __init__(self):
-        threading.Thread.__init__(self)
-        self.daemon = True
-        self.interface = config['midi_in']
-        self.midi = rtmidi.MidiIn()
-        self.queue = queue.Queue()
-        self.callbacks = {}
-        self.threads = []
-        available_interfaces = self.midi.get_ports()
-        if available_interfaces and self.interface is not None:
-            if self.interface not in available_interfaces:
-                print(f"Interface index {self.interface} not available")
-                print(f"MIDI inputs available: {available_interfaces}")
-                exit()
-            print(f"MIDI IN: {self.interface}")
-            self.midi.open_port(available_interfaces.index(self.interface))
-        self.start()
+#     def __init__(self):
+#         threading.Thread.__init__(self)
+#         self.daemon = True
+#         self.interface = config['midi_in']
+#         self.midi = rtmidi.MidiIn()
+#         self.queue = queue.Queue()
+#         self.callbacks = {}
+#         self.threads = []
+#         available_interfaces = self.midi.get_ports()
+#         if available_interfaces and self.interface is not None:
+#             if self.interface not in available_interfaces:
+#                 print(f"Interface index {self.interface} not available")
+#                 print(f"MIDI inputs available: {available_interfaces}")
+#                 exit()
+#             print(f"MIDI IN: {self.interface}")
+#             self.midi.open_port(available_interfaces.index(self.interface))
+#         self.start()
 
-    def run(self):
-        def receive_message(event, data=None):
-            message, deltatime = event
-            if message[0] & 0b11110000 == CONTROLLER_CHANGE:
-                nop, control, value = message
-                self.queue.put((control, value / 127.0))
-            elif (message[0] & 0b11110000 == NOTE_ON):
-                if len(message) < 3:
-                    return  # ?
-                channel, pitch, velocity = message
-                channel -= NOTE_ON
-                if channel < len(self.threads):
-                    thread = self.threads[channel]
-                    thread.note(pitch, velocity)
-        # self.midi.set_callback(receive_message)
-        while True:
-            time.sleep(0.1)
+#     def run(self):
+#         def receive_message(event, data=None):
+#             message, deltatime = event
+#             if message[0] & 0b11110000 == CONTROLLER_CHANGE:
+#                 nop, control, value = message
+#                 self.queue.put((control, value / 127.0))
+#             elif (message[0] & 0b11110000 == NOTE_ON):
+#                 if len(message) < 3:
+#                     return  # ?
+#                 channel, pitch, velocity = message
+#                 channel -= NOTE_ON
+#                 if channel < len(self.threads):
+#                     thread = self.threads[channel]
+#                     thread.note(pitch, velocity)
+#         self.midi.set_callback(receive_message)
+#         while True:
+#             time.sleep(0.1)
 
-    # def perform_callbacks(self):
-    #     while True:
-    #         try:
-    #             control, value = self.queue.get_nowait()
-    #         except queue.Empty:
-    #             return
-    #         if control in self.callbacks:
-    #             if num_args(self.callbacks[control]) > 0:
-    #                 self.callbacks[control](value)
-    #             else:
-    #                 self.callbacks[control]()
+#     def perform_callbacks(self):
+#         while True:
+#             try:
+#                 control, value = self.queue.get_nowait()
+#             except queue.Empty:
+#                 return
+#             if control in self.callbacks:
+#                 if num_args(self.callbacks[control]) > 0:
+#                     self.callbacks[control](value)
+#                 else:
+#                     self.callbacks[control]()
 
-    # def callback(self, control, f):
-    #     """For a given control message, call a function"""
-    #     self.callbacks[control] = f
+#     def callback(self, control, f):
+#         """For a given control message, call a function"""
+#         self.callbacks[control] = f
 
 
 midi_out = MidiOut()
-midi_in = MidiIn()
+# midi_in = MidiIn()

@@ -2,13 +2,18 @@
 
 from rhiz import *
 
-tempo(60)
+tempo(240)
+
 
 # my_tween = T(0, 127, 4)
-P({C4, B2}, [C4, C3], (C4, D4), C(24, 127)) * 3 >> 3
+# S({C4, B2}, [{C4, C(20, 20)}, C3], (C4, D4), C(24, 127), feel=ease_out()) * 3 >> 3
+# play()
+
+
+my_tween = T(0, 127)
+S(C4, C(10, my_tween)) * 4
 play()
 
 
-# # my_tween = T(0, 127, 4)
-# P(C4, {C4, C(24, 127)}, C4, C4, C(13, 120))
-# play()
+# pos isn't working right on tween yet ... need to be able to multiply it?
+# and is it going all the way? rounding issues?
