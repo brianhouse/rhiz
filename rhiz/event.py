@@ -2,8 +2,6 @@ from random import random
 from .config import config
 from .midi import midi_out
 
-_names = "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"
-
 
 class Note():
 
@@ -37,6 +35,22 @@ class Note():
         midi_out.send_note(channel, self.n, int(velocity * 127))
 
 
+class Control():
+
+    def __init__(self, control, value):
+        self.control = control
+        self.value = value
+
+    def play(self, channel):
+        midi_out.send_control(channel, self.control, self.value)
+
+    def __repr__(self):
+        return f"{self.control}:{self.value}"
+
+
+_names = "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"
+
+
 for n in range(0, 128):
     name = _names[n % 12] + str((n // 12) - 1).replace("-1", "N")
     globals()[name] = Note(name, n)
@@ -46,3 +60,5 @@ for n in range(0, 128):
 
 
 _ = Note("_", -1)
+
+C = Control

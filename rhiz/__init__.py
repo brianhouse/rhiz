@@ -1,6 +1,6 @@
 import atexit, time
-from .note import *
-from .note import _
+from .event import *
+from .event import _
 from .pattern import Pattern
 
 
@@ -10,8 +10,8 @@ class Player():
         self.stems = []
         self.rate = 1.0
 
-    def _add(self, *pattern, rate=1.0, phase=None):
-        stem = Stem(pattern, rate, phase)
+    def _add(self, *pattern, rate=1.0, feel=None):
+        stem = Stem(pattern, rate, feel)
         self.stems.append(stem)
         return stem
 
@@ -41,12 +41,12 @@ class Player():
 
 class Stem():
 
-    def __init__(self, pattern, rate=1.0, phase=None):
+    def __init__(self, pattern, rate=1.0, feel=None):
         self._pattern = Pattern(pattern)
         self._channel = 1
         self._repeat = 1
         self._rate = rate
-        self._phase = phase
+        self._feel = feel
         self._cycles = 0
         self._index = -1
         self._last_edge = 0
@@ -57,8 +57,8 @@ class Stem():
         if self._cycles >= self._repeat:
             return True
         pos = self._cycles % 1.0
-        if self._phase is not None:
-            pos = self._phase(pos)
+        if self._feel is not None:
+            pos = self._feel(pos)
         i = int(pos * len(self._steps))
         if i != self._index or (len(self._steps) == 1 and int(self._cycles) != self._last_edge):  # contingency for whole notes
             self._index = (self._index + 1) % len(self._steps)  # dont skip steps
@@ -68,21 +68,22 @@ class Stem():
                 # else:
                 pattern = self._pattern
                 self._steps = pattern.resolve()  # new patterns kick in here
+                print(self._steps)
             self._handle_step(self._steps[self._index])
         self._last_edge = int(self._cycles)
         return False
 
     def _handle_step(self, step):
-        if isinstance(step, Note):
+        if isinstance(step, Note) or isinstance(step, Control):
             step.play(self._channel)
+        elif isinstance(step, set):
+            chord = list(step)
+            # chord.sort(lambda e: True if isinstance(e, dict) else False)
+            # print(chord)
+            for substep in chord:
+                self._handle_step(substep)
         else:
-            if isinstance(step, set):
-                for substep in step:
-                    self._handle_step(substep)
-            elif isinstance(step, dict):
-                pass
-            else:
-                raise Exception(f"Got an unexpected step ({step})")
+            raise Exception(f"Got an unexpected step ({step})")
 
     def __mul__(self, repeat):
         assert isinstance(repeat, int)
