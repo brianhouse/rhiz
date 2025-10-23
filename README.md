@@ -14,8 +14,6 @@ https://github.com/brianhouse/braid/tree/dd03c6c931574bdddae9f0eedb4125e811f7b52
 
 tweens
 
-quit with the underscores
-
 config mappings
 
 
@@ -26,5 +24,10 @@ tweens can be:
 - cc values
 - patterns
 - individual notes
+- signals
 
 that's it, right?
+
+
+accent, variance etc as ints. also, previously those were tweenable.
+

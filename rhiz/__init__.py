@@ -12,17 +12,17 @@ class Player():
         self.tweens = []
         self.rate = 1.0
 
-    def _add_stem(self, *pattern, rate=1.0, f=None):
+    def add_stem(self, *pattern, rate=1.0, f=None):
         stem = Stem(pattern, rate, f)
         self.stems.append(stem)
         return stem
 
-    def _add_tween(self, initial, target, rate=1.0, f=linear(), osc=False, saw=False):
+    def add_tween(self, initial, target, rate=1.0, f=linear(), osc=False, saw=False):
         tween = Tween(initial, target, rate, f, osc, saw)
         self.tweens.append(tween)
         return tween
 
-    def _play(self):
+    def play(self):
         start_t = time.perf_counter()
         previous_t = 0.0
         try:
@@ -45,111 +45,111 @@ class Player():
         except KeyboardInterrupt:
             pass
 
-    def _stop(self):
+    def stop(self):
         pass
 
 
 class Stem():
 
     def __init__(self, pattern, rate, f):
-        self._channel = 1
-        self._repeat = 1
-        self._pattern = Pattern(pattern)
-        self._rate = rate
-        self._f = f
-        self._cycles = 0
-        self._index = -1
-        self._last_edge = 0
-        self._steps = [_]
+        self.channel = 1
+        self.repeat = 1
+        self.pattern = Pattern(pattern)
+        self.rate = rate
+        self.f = f
+        self.cycles = 0
+        self.index = -1
+        self.last_edge = 0
+        self.steps = [_]
 
     def update(self, delta_t):
-        self._cycles += delta_t * self._rate * _player.rate
-        if self._cycles >= self._repeat:
+        self.cycles += delta_t * self.rate * player.rate
+        if self.cycles >= self.repeat:
             return True
-        pos = self._cycles % 1.0
-        if self._f is not None:
-            pos = self._f(pos)
-        i = int(pos * len(self._steps))
-        if i != self._index or (len(self._steps) == 1 and int(self._cycles) != self._last_edge):  # contingency for whole notes
-            self._index = (self._index + 1) % len(self._steps)  # dont skip steps
-            if self._index == 0:
+        pos = self.cycles % 1.0
+        if self.f is not None:
+            pos = self.f(pos)
+        i = int(pos * len(self.steps))
+        if i != self.index or (len(self.steps) == 1 and int(self.cycles) != self.last_edge):  # contingency for whole notes
+            self.index = (self.index + 1) % len(self.steps)  # dont skip steps
+            if self.index == 0:
                 # if isinstance(self.pattern, Tween):  # pattern tweens only happen on an edge
                 #     pattern = self.pattern.value()
                 # else:
-                pattern = self._pattern
-                self._steps = pattern.resolve()  # new patterns kick in here
-                print(self._steps)
-            self._handle_step(self._steps[self._index])
-        self._last_edge = int(self._cycles)
+                pattern = self.pattern
+                self.steps = pattern.resolve()  # new patterns kick in here
+                print(self.steps)
+            self._handle_step(self.steps[self.index])
+        self.last_edge = int(self.cycles)
         return False
 
     def _handle_step(self, step):
         if isinstance(step, Note):
-            step.play(self._channel)
+            step.play(self.channel)
         elif isinstance(step, Control):
-            step.send(self._channel, step.value if not isinstance(step.value, Tween) else step.value.value())
+            step.send(self.channel, step.value if not isinstance(step.value, Tween) else step.value.current())
         elif isinstance(step, set):
             chord = list(step)
             chord.sort(key=lambda e: False if isinstance(e, Control) else True)
             for substep in chord:
                 self._handle_step(substep)
         elif isinstance(step, Tween):
-            self._handle_step(step.value())
+            self._handle_step(step.current())
         else:
             raise Exception(f"Got an unexpected step ({step})")
 
     def __mul__(self, repeat):
         assert isinstance(repeat, int)
-        self._repeat = repeat
+        self.repeat = repeat
         return self
 
     def __rshift__(self, channel):
         assert isinstance(channel, int) and channel > 0 and channel < 16
-        self._channel = channel
+        self.channel = channel
         return self
 
 
 class Tween():
 
     def __init__(self, initial, target, rate, f=linear(), osc=False, saw=False):
-        self._repeat = 1
-        self._initial = initial
-        self._target = target
-        self._rate = rate
-        self._f = f
-        self._osc = osc
-        self._saw = saw
-        self._cycles = 0
-        self._pos = 0
+        self.repeat = 1
+        self.initial = initial
+        self.target = target
+        self.rate = rate
+        self.f = f
+        self.osc = osc
+        self.saw = saw
+        self.cycles = 0
+        self.pos = 0
 
     def update(self, delta_t):
-        self._cycles += delta_t * self._rate * _player.rate
-        if self._cycles >= self._repeat:
-            if self._saw:
-                self._cycles = 0
-            elif self._osc:
-                target = self._target
-                self._target = self._initial
-                self._initial = target
-                self._cycles = 0
+        self.cycles += delta_t * self.rate * player.rate
+        if self.cycles >= self.repeat:
+            if self.saw:
+                self.cycles = 0
+            elif self.osc:
+                target = self.target
+                self.target = self.initial
+                self.initial = target
+                self.cycles = 0
             else:
                 return True
-        self._pos = self._cycles % 1.0
-        self._pos = self._f(self._pos)
+        self.pos = self.cycles % 1.0
+        self.pos = self.f(self.pos)
         return False
 
-    def value(self):
-        return (self._pos * (self._target - self._initial)) + self._initial
+    def current(self):
+        return (self.pos * (self.target - self.initial)) + self.initial
 
     def __repr__(self):
-        return f"|{self._initial}>{self._target}|"
+        return f"|{self.initial}>{self.target}|"
 
 
-_player = Player()
-play = _player._play
-stop = _player._stop
-S = _player._add_stem
-T = _player._add_tween
+player = Player()
+play = player.play
+stop = player.stop
+S = player.add_stem
+T = player.add_tween
 
 
 def tempo(value=False):
@@ -157,9 +157,9 @@ def tempo(value=False):
     if value:
         value /= 60.0
         value /= 4.0
-        _player.rate = value
+        player.rate = value
     else:
-        return _player.rate * 4.0 * 60.0
+        return player.rate * 4.0 * 60.0
 
 
 def _exit_handler():

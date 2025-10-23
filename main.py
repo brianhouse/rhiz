@@ -10,7 +10,7 @@ tempo(240)
 # play()
 
 
-my_tween = T(0, 127)
+my_tween = T(0, 127, rate=.25)
 S(C4, C(10, my_tween)) * 4
 play()
 
