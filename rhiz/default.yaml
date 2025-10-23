@@ -4,6 +4,6 @@ throttle: 0
 send_note_offs: False
 log_midi: True
 
-accent: .3
-ghost: .2
-variance: .1
+accent: 40
+ghost: 25
+variance: 10

@@ -11,9 +11,6 @@ tempo(240)
 
 
 my_tween = T(0, 127, rate=.25)
-S(C4, C(10, my_tween)) * 4
+# S(C4, C(10, my_tween)) * 4
+S(C4, T(C4, D4, rate=.25)) * 4  # rate here is awkward, no?
 play()
-
-
-# pos isn't working right on tween yet ... need to be able to multiply it?
-# and is it going all the way? rounding issues?

@@ -1,5 +1,5 @@
-from random import choice
 from .event import _
+from random import choice
 
 
 class Pattern(list):

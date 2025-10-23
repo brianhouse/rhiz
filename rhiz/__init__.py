@@ -3,6 +3,7 @@ from .event import *
 from .event import _
 from .signal import *
 from .pattern import Pattern
+from random import random
 
 
 class Player():
@@ -112,9 +113,9 @@ class Stem():
 class Tween():
 
     def __init__(self, initial, target, rate, f=linear(), osc=False, saw=False):
-        self.repeat = 1
         self.initial = initial
         self.target = target
+        assert type(self.initial) is type(self.target)
         self.rate = rate
         self.f = f
         self.osc = osc
@@ -124,7 +125,7 @@ class Tween():
 
     def update(self, delta_t):
         self.cycles += delta_t * self.rate * player.rate
-        if self.cycles >= self.repeat:
+        if self.cycles >= 1:
             if self.saw:
                 self.cycles = 0
             elif self.osc:
@@ -139,7 +140,10 @@ class Tween():
         return False
 
     def current(self):
-        return (self.pos * (self.target - self.initial)) + self.initial
+        if isinstance(self.target, int) or isinstance(self.target, float):
+            return (self.pos * (self.target - self.initial)) + self.initial
+        elif isinstance(self.target, Note):
+            return self.initial if random() > self.pos else self.target
 
     def __repr__(self):
         return f"|{self.initial}>{self.target}|"

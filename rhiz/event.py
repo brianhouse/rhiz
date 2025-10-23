@@ -1,6 +1,6 @@
-from random import random
 from .config import config
 from .midi import midi_out
+from random import randint
 
 
 class Note():
@@ -30,9 +30,9 @@ class Note():
         if self.off:
             velocity = 0
         else:
-            velocity = 1. - config['accent'] + (self.accent * config['accent']) - (self.ghost * config['ghost'])
-            velocity -= random() * config['variance']
-        midi_out.send_note(channel, self.n, int(velocity * 127))
+            velocity = 127 - config['accent'] + (self.accent * config['accent']) - (self.ghost * config['ghost'])
+            velocity -= randint(0, config['variance'])
+        midi_out.send_note(channel, self.n, int(velocity))
 
 
 class Control():

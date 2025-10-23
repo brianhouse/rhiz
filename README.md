@@ -21,9 +21,9 @@ config mappings
 ## thinking
 
 tweens can be:
-- cc values
+- cc values *
+- individual notes *
 - patterns
-- individual notes
 - signals
 
 that's it, right?
