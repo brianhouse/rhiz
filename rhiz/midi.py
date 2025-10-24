@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import sys, time, threading, queue, rtmidi
 from rtmidi.midiconstants import NOTE_ON, NOTE_OFF, CONTROLLER_CHANGE
 from .config import config
@@ -47,13 +45,13 @@ class MidiOut(threading.Thread):
                 if isinstance(value, bool):
                     value = 127 if value else 0
                 if config['log_midi']:
-                    print("MIDI ctrl %s %s %s" % (channel, control, value))
+                    print(f"MIDI ctrl {channel} {control} {value}")
                 channel -= 1
                 self.midi.send_message([CONTROLLER_CHANGE | (channel & 0xF), control, value])
             if note is not None:
                 pitch, velocity = note
                 if config['log_midi']:
-                    print("MIDI note %s %s %s" % (channel, pitch, velocity))
+                    print(f"MIDI note {channel} {pitch} {velocity}")
                 channel -= 1
                 if velocity:
                     self.midi.send_message([NOTE_ON | (channel & 0xF), pitch & 0x7F, velocity & 0x7F])

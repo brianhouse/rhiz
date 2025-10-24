@@ -10,7 +10,16 @@ tempo(240)
 # play()
 
 
-my_tween = T(0, 127, rate=.25)
-# S(C4, C(10, my_tween)) * 4
-S(C4, T(C4, D4, rate=.25)) * 4  # rate here is awkward, no?
+# my_tween = T(0, 127, rate=.25)
+# # S(C4, C(10, my_tween)) * 4
+# S(C4, T(C4, D4, rate=.25)) * 4  # rate here is awkward, no?
+# play()
+
+
+p1 = C4, C4, C4, C4
+p2 = D2, D2, D2
+combo = T(p1, p2, .25)
+
+S(combo) * 4
+
 play()
