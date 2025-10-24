@@ -1,5 +1,5 @@
 from .event import *
-from .signal import linear
+from .signal import *
 from .tween import Tween
 from .stem import Stem
 import atexit, time
