@@ -6,6 +6,6 @@ log_midi: True
 
 sleep_warning: 4
 
-accent: 40
-ghost: 25
-variance: 10
+accent: 50
+ghost: 10
+variance: 20
