@@ -4,6 +4,8 @@ throttle: 0
 send_note_offs: False
 log_midi: True
 
+sleep_warning: 4
+
 accent: 40
 ghost: 25
 variance: 10

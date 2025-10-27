@@ -8,13 +8,14 @@ class MidiOut(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         self.daemon = True
-        self.interface = config['midi_in']
+        self.interface = config['midi_out']
         self.midi = rtmidi.MidiOut()
         self.queue = queue.Queue()
         self.throttle = config['throttle']
         self.send_note_offs = config['send_note_offs']
         self.note_ons = {}
         available_interfaces = self.midi.get_ports()
+        print(available_interfaces)
         if available_interfaces and self.interface is not None:
             if self.interface not in available_interfaces:
                 print(f"Interface index {self.interface} not available")
@@ -42,8 +43,6 @@ class MidiOut(threading.Thread):
             channel, control, note = self.queue.get()
             if control is not None:
                 control, value = control
-                if isinstance(value, bool):
-                    value = 127 if value else 0
                 if config['log_midi']:
                     print(f"MIDI ctrl {channel} {control} {value}")
                 channel -= 1
@@ -58,7 +57,7 @@ class MidiOut(threading.Thread):
                 else:
                     self.midi.send_message([NOTE_OFF | (channel & 0xF), pitch & 0x7F, 0])
             if self.throttle > 0:
-                time.sleep(self.throttle)
+                time.sleep(self.throttle / 1000)
 
 
 # class MidiIn(threading.Thread):
@@ -114,7 +113,6 @@ class MidiOut(threading.Thread):
 #     def callback(self, control, f):
 #         """For a given control message, call a function"""
 #         self.callbacks[control] = f
-
 
 midi_out = MidiOut()
 # midi_in = MidiIn()

@@ -1,4 +1,5 @@
 from .event import *
+from .event import _
 from .signal import *
 from .tween import Tween
 from .stem import Stem
@@ -23,37 +24,47 @@ class Player():
         return tween
 
     def play(self):
-        start_t = time.perf_counter()
-        previous_t = 0.0
         try:
+            t = time.perf_counter()
             while len(self.stems):
-                c = time.perf_counter()
-                t = c - start_t
-                delta_t = t - previous_t
+                delta_t = time.perf_counter() - t
+                t = time.perf_counter()
                 for tween in self.tweens:
                     if tween.update(delta_t):
                         self.tweens.remove(tween)
                 for stem in self.stems:
                     if stem.update(delta_t):
                         self.stems.remove(stem)
-                rc = int((time.perf_counter() - c) * 1000)
-                if rc > 1:
-                    print(f"Warning: update took {rc}ms\n")
-                previous_t = t
-                time.sleep(0.01)
+                update_elapsed_ms = int((time.perf_counter() - t) * 1000)
+                if update_elapsed_ms > 1:
+                    print(f"Warning: update took {update_elapsed_ms}ms")
+                _timed_sleep()
             self.stems.clear()
         except KeyboardInterrupt:
-            pass
+            exit()
+        except Exception as e:
+            print(e)
+            exit()
 
     def stop(self):
-        pass
+        exit()
 
 
-player = Player()
-play = player.play
-stop = player.stop
-S = player.add_stem
-T = player.add_tween
+def _timed_sleep(duration=0.001):
+    sleep_start_t = time.perf_counter()
+    time.sleep(duration)
+    sleep_elapsed_ms = int((time.perf_counter() - sleep_start_t) * 1000)
+    if sleep_elapsed_ms >= config['sleep_warning']:
+        print(f"Warning: sleep() took {sleep_elapsed_ms}ms")
+
+
+def _exit_handler():
+    # panic()
+    time.sleep(0.1)  # for midi to finish
+    print("\n-------------> X")
+
+
+atexit.register(_exit_handler)
 
 
 def tempo(value=False):
@@ -66,13 +77,11 @@ def tempo(value=False):
         return player.rate * 4.0 * 60.0
 
 
-def _exit_handler():
-    stop()
-    time.sleep(0.1)  # for midi to finish
-    print("\n-------------> X")
-
-
-atexit.register(_exit_handler)
+player = Player()
+play = player.play
+stop = player.stop
+S = player.add_stem
+T = player.add_tween
 
 
 tempo(115)
