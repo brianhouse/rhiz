@@ -1,9 +1,9 @@
-from .event import *
-from .event import _
-from .signal import *
+from .config import config
+from .event import _, notes, C
+from .signal import plot, show_plots, linear, ease_in, ease_out, ease_in_out, ease_out_in, timeseries, breakpoints, cross
 from .tween import Tween
 from .stem import Stem
-import atexit, time
+import atexit, time, sys, os
 
 
 class Player():
@@ -43,7 +43,7 @@ class Player():
         except KeyboardInterrupt:
             exit()
         except Exception as e:
-            print(e)
+            print(exc(e))
             exit()
 
     def stop(self):
@@ -67,6 +67,10 @@ def _exit_handler():
 atexit.register(_exit_handler)
 
 
+def exc(e):
+    return "%s <%s:%s> %s" % (sys.exc_info()[0].__name__, os.path.split(sys.exc_info()[2].tb_frame.f_code.co_filename)[1], sys.exc_info()[2].tb_lineno, e)
+
+
 def tempo(value=False):
     """Convert to a multiplier of 1hz"""
     if value:
@@ -82,6 +86,12 @@ play = player.play
 stop = player.stop
 S = player.add_stem
 T = player.add_tween
+
+
+__all__ = ["play", "stop", "tempo", "S", "T", "C", "_", "plot", "show_plots", "linear", "ease_in", "ease_out", "ease_in_out", "ease_out_in", "timeseries", "breakpoints", "cross"]
+for name, note in notes.items():
+    globals()[name] = note
+__all__.extend(notes)
 
 
 tempo(115)

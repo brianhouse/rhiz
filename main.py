@@ -1,7 +1,14 @@
 #!venv/bin/python
 
 from rhiz import *
-from rhiz import _
+
+# globs = list(globals().keys())
+# for item in globs:
+#     print(item)
+
+# print('done')
+
+# exit()
 
 tempo(130)
 

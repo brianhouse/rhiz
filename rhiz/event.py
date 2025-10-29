@@ -13,13 +13,13 @@ class Note():
         self.off = off
 
     def __pos__(self):
-        return globals()[f"{self.name}_ACCENT"]
+        return notes[f"{self.name}_ACCENT"]
 
     def __neg__(self):
-        return globals()[f"{self.name}_GHOST"]
+        return notes[f"{self.name}_GHOST"]
 
     def __invert__(self):
-        return globals()[f"{self.name}_OFF"]
+        return notes[f"{self.name}_OFF"]
 
     def __repr__(self):
         return (self.name if not self.ghost else f"-{self.name}") if not self.accent else f"+{self.name}"
@@ -49,15 +49,14 @@ class Control():
 
 
 _names = "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"
-
+notes = {}
 
 for n in range(0, 128):
     name = _names[n % 12] + str((n // 12) - 1).replace("-1", "N")
-    globals()[name] = Note(name, n)
-    globals()[name + "_ACCENT"] = Note(name, n, accent=True)
-    globals()[name + "_GHOST"] = Note(name, n, ghost=True)
-    globals()[name + "_OFF"] = Note(name, n, off=True)
-
+    notes[name] = Note(name, n)
+    notes[name + "_ACCENT"] = Note(name, n, accent=True)
+    notes[name + "_GHOST"] = Note(name, n, ghost=True)
+    notes[name + "_OFF"] = Note(name, n, off=True)
 
 _ = Note("_", -1)
 
