@@ -52,9 +52,13 @@ class Player():
 
 def _timed_sleep(duration=0.001):
     sleep_start_t = time.perf_counter()
-    time.sleep(duration)
+    if config['overdrive']:
+        while time.perf_counter() - sleep_start_t < duration:
+            pass
+    else:
+        time.sleep(duration)
     sleep_elapsed_ms = int((time.perf_counter() - sleep_start_t) * 1000)
-    if sleep_elapsed_ms >= config['sleep_warning']:
+    if sleep_elapsed_ms > config['sleep_warning']:
         print(f"Warning: sleep() took {sleep_elapsed_ms}ms")
 
 

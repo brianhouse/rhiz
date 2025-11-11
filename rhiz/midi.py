@@ -3,116 +3,43 @@ from rtmidi.midiconstants import NOTE_ON, NOTE_OFF, CONTROLLER_CHANGE
 from .config import config
 
 
-class MidiOut(threading.Thread):
-
-    def __init__(self):
-        threading.Thread.__init__(self)
-        self.daemon = True
-        self.interface = config['midi_out']
-        self.midi = rtmidi.MidiOut()
-        self.queue = queue.Queue()
-        self.throttle = config['throttle']
-        self.send_note_offs = config['send_note_offs']
-        self.note_ons = {}
-        available_interfaces = self.midi.get_ports()
-        print(available_interfaces)
-        if available_interfaces and self.interface is not None:
-            if self.interface not in available_interfaces:
-                print(f"Interface index {self.interface} not available")
-                print(f"MIDI outputs available: {available_interfaces}")
-                exit()
-            print(f"MIDI OUT: {self.interface}")
-            self.midi.open_port(available_interfaces.index(self.interface))
-        else:
-            print("MIDI OUT opening virtual interface 'Rhiz'...")
-            self.midi.open_virtual_port('Rhiz')
-        self.start()
-
-    def send_control(self, channel, control, value):
-        self.queue.put((channel, (control, value), None))
-
-    def send_note(self, channel, pitch, velocity):
-        if self.send_note_offs:
-            if channel in self.note_ons:
-                self.queue.put((channel, None, (self.note_ons[channel], 0)))
-            self.note_ons[channel] = pitch
-        self.queue.put((channel, None, (pitch, velocity)))
-
-    def run(self):
-        while True:
-            channel, control, note = self.queue.get()
-            if control is not None:
-                control, value = control
-                if config['log_midi']:
-                    print(f"MIDI ctrl {channel} {control} {value}")
-                channel -= 1
-                self.midi.send_message([CONTROLLER_CHANGE | (channel & 0xF), control, value])
-            if note is not None:
-                pitch, velocity = note
-                if config['log_midi']:
-                    print(f"MIDI note {channel} {pitch} {velocity}")
-                channel -= 1
-                if velocity:
-                    self.midi.send_message([NOTE_ON | (channel & 0xF), pitch & 0x7F, velocity & 0x7F])
-                else:
-                    self.midi.send_message([NOTE_OFF | (channel & 0xF), pitch & 0x7F, 0])
-            if self.throttle > 0:
-                time.sleep(self.throttle / 1000)
+midi_out = rtmidi.MidiOut()
+note_ons = {}
 
 
-# class MidiIn(threading.Thread):
+available_interfaces = midi_out.get_ports()
+print(f"Available interfaces: {available_interfaces}")
+if available_interfaces and config['midi_out'] is not None:
+    if config['midi_out'] not in available_interfaces:
+        print(f"Interface index {config['midi_out']} not available")
+        print(f"MIDI outputs available: {available_interfaces}")
+        exit()
+    print(f"MIDI OUT: {config['midi_out']}")
+    midi_out.open_port(available_interfaces.index(config['midi_out']))
+else:
+    print("MIDI OUT opening virtual interface 'Rhiz'...")
+    midi_out.open_virtual_port('Rhiz')
 
-#     def __init__(self):
-#         threading.Thread.__init__(self)
-#         self.daemon = True
-#         self.interface = config['midi_in']
-#         self.midi = rtmidi.MidiIn()
-#         self.queue = queue.Queue()
-#         self.callbacks = {}
-#         self.threads = []
-#         available_interfaces = self.midi.get_ports()
-#         if available_interfaces and self.interface is not None:
-#             if self.interface not in available_interfaces:
-#                 print(f"Interface index {self.interface} not available")
-#                 print(f"MIDI inputs available: {available_interfaces}")
-#                 exit()
-#             print(f"MIDI IN: {self.interface}")
-#             self.midi.open_port(available_interfaces.index(self.interface))
-#         self.start()
 
-#     def run(self):
-#         def receive_message(event, data=None):
-#             message, deltatime = event
-#             if message[0] & 0b11110000 == CONTROLLER_CHANGE:
-#                 nop, control, value = message
-#                 self.queue.put((control, value / 127.0))
-#             elif (message[0] & 0b11110000 == NOTE_ON):
-#                 if len(message) < 3:
-#                     return  # ?
-#                 channel, pitch, velocity = message
-#                 channel -= NOTE_ON
-#                 if channel < len(self.threads):
-#                     thread = self.threads[channel]
-#                     thread.note(pitch, velocity)
-#         self.midi.set_callback(receive_message)
-#         while True:
-#             time.sleep(0.1)
+def send_control(channel, control, value):
+    if config['log_midi']:
+        print(f"MIDI ctrl {channel} {control} {value}")
+    midi_out.send_message([CONTROLLER_CHANGE | (channel - 1 & 0xF), control, value])
+    if config['throttle'] > 0:
+        time.sleep(config['throttle'] / 1000)
 
-#     def perform_callbacks(self):
-#         while True:
-#             try:
-#                 control, value = self.queue.get_nowait()
-#             except queue.Empty:
-#                 return
-#             if control in self.callbacks:
-#                 if num_args(self.callbacks[control]) > 0:
-#                     self.callbacks[control](value)
-#                 else:
-#                     self.callbacks[control]()
 
-#     def callback(self, control, f):
-#         """For a given control message, call a function"""
-#         self.callbacks[control] = f
+def send_note(channel, pitch, velocity):
+    if config['send_note_offs']:
+        if channel in note_ons:
+            send_note(channel, note_ons[channel], 0)
+        note_ons[channel] = pitch
+    if config['log_midi']:
+        print(f"MIDI note {channel} {pitch} {velocity}")
+    if velocity:
+        midi_out.send_message([NOTE_ON | (channel - 1 & 0xF), pitch & 0x7F, velocity & 0x7F])
+    else:
+        midi_out.send_message([NOTE_OFF | (channel - 1 & 0xF), pitch & 0x7F, 0])
+    if config['throttle'] > 0:
+        time.sleep(config['throttle'] / 1000)
 
-midi_out = MidiOut()
-# midi_in = MidiIn()

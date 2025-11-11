@@ -1,5 +1,5 @@
 from .config import config
-from .midi import midi_out
+from .midi import send_note, send_control
 from random import randint
 
 
@@ -32,7 +32,7 @@ class Note():
         else:
             velocity = 127 - config['accent'] + (self.accent * config['accent']) - (self.ghost * config['ghost'])
             velocity -= randint(0, config['variance'])
-        midi_out.send_note(channel, self.n, int(velocity))
+        send_note(channel, self.n, int(velocity))
 
 
 class Control():
@@ -42,7 +42,7 @@ class Control():
         self.value = value
 
     def send(self, channel, value):
-        midi_out.send_control(channel, self.control, int(value))
+        send_control(channel, self.control, int(value))
 
     def __repr__(self):
         return f"{self.control}:{self.value}"
