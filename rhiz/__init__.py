@@ -98,4 +98,18 @@ for name, note in notes.items():
 __all__.extend(notes)
 
 
+if 'map' in config:
+    mappings = {}
+    for key, value in config['map'].items():
+        if isinstance(value, (int, float)):
+            pass
+        elif isinstance(value, str) and value in __all__ and value in globals():
+            value = globals()[value]
+        else:
+            print("Unknown mapping")
+        globals()[key] = value
+        mappings[key] = value
+    __all__.extend(mappings)
+
+
 tempo(115)

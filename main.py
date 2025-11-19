@@ -27,18 +27,11 @@ tempo(130)
 # combo = T(p1, p2, .25)
 # S(combo) * 4 >> 3
 
-BD1 = C2
-BD2 = Db2
-SD = D2
-OH = F2
-HH = Gb2
-CL = Ab2
-
 
 while True:
-    S(BD1, +BD1, (BD1, [BD1, BD1, _, _]), (+BD1, [+BD1, (BD1, [BD1, BD1])])) * 4 >> 3
-    S(HH, [OH, (HH, [HH, HH])], +HH, [OH, HH], (HH, HH, [HH, HH, HH]), [OH, HH], +HH, OH) * 4 >> 3
-    S(_, {CL, SD}, ((_, -SD), [_, _, -CL, ]), {CL, SD}) * 4 >> 3
+    S(BD, +BD, (BD, [BD, BD, _, _]), (+BD, [+BD, (BD, [BD, BD])])) * 4 >> tanz
+    S(HH, [OH, (HH, [HH, HH])], +HH, [OH, HH], (HH, HH, [HH, HH, HH]), [OH, HH], +HH, OH) * 4 >> tanz
+    S(_, {CL, SD}, ((_, -SD), [_, _, -CL, ]), {CL, SD}) * 4 >> tanz
     play()
 
 
