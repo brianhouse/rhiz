@@ -1,5 +1,5 @@
 from .config import config
-from .event import _, notes, C
+from .event import _, notes, controls
 from .signal import plot, show_plots, linear, ease_in, ease_out, ease_in_out, ease_out_in, timeseries, breakpoints, cross
 from .tween import Tween
 from .stem import Stem
@@ -92,10 +92,13 @@ S = player.add_stem
 T = player.add_tween
 
 
-__all__ = ["play", "stop", "tempo", "S", "T", "C", "_", "plot", "show_plots", "linear", "ease_in", "ease_out", "ease_in_out", "ease_out_in", "timeseries", "breakpoints", "cross"]
+__all__ = ["play", "stop", "tempo", "S", "T", "_", "plot", "show_plots", "linear", "ease_in", "ease_out", "ease_in_out", "ease_out_in", "timeseries", "breakpoints", "cross"]
 for name, note in notes.items():
     globals()[name] = note
 __all__.extend(notes)
+for name, control in controls.items():
+    globals()[name] = control
+__all__.extend(controls)
 
 
 if 'map' in config:

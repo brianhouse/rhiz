@@ -44,7 +44,10 @@ class Stem():
         if isinstance(step, Note):
             step.play(self.channel)
         elif isinstance(step, Control):
-            step.send(self.channel, step.value if not isinstance(step.value, Tween) else step.value.current())
+            value = step.value if not isinstance(step.value, Tween) else step.value.current()
+            if value is None:
+                raise Exception("No value for CC")
+            step.send(self.channel, value)
         elif isinstance(step, set):
             chord = list(step)
             chord.sort(key=lambda e: False if isinstance(e, Control) else True)

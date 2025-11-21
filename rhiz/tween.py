@@ -18,10 +18,11 @@ class Tween():
         self.saw = saw
         self.cycles = 0
         self.pos = 0
+        self._current = None
 
     def update(self, delta_t):
         self.cycles += delta_t * self.rate * rhiz.player.rate
-        if self.cycles >= 1:
+        if self.cycles > 1:
             if self.saw:
                 self.cycles = 0
             elif self.osc:
@@ -33,19 +34,22 @@ class Tween():
                 return True
         self.pos = self.cycles % 1.0
         self.pos = self.f(self.pos)
+        self._current = None
         return False
 
     def current(self):
-        if isinstance(self.target, int) or isinstance(self.target, float):
-            return (self.pos * (self.target - self.initial)) + self.initial
-        elif isinstance(self.target, Note):
-            return self.initial if random() > self.pos else self.target
-        elif isinstance(self.target, types.FunctionType):
-            return (self.initial(self.pos) + self.target(self.pos)) / 2
-        elif isinstance(self.target, Pattern) or isinstance(self.target, tuple) or isinstance(self.target, list):
-            return blend(self.initial, self.target, self.pos)
-        else:
-            raise Exception(f"Unknown Tween type ({type(self.target)}) {self.target}")
+        if not self._current:
+            if isinstance(self.target, int) or isinstance(self.target, float):
+                self._current = (self.pos * (self.target - self.initial)) + self.initial
+            elif isinstance(self.target, Note):
+                self._current = self.initial if random() > self.pos else self.target
+            elif isinstance(self.target, types.FunctionType):
+                self._current = (self.initial(self.pos) + self.target(self.pos)) / 2
+            elif isinstance(self.target, Pattern) or isinstance(self.target, tuple) or isinstance(self.target, list):
+                self._current = blend(self.initial, self.target, self.pos)
+            else:
+                raise Exception(f"Unknown Tween type ({type(self.target)}) {self.target}")
+        return self._current
 
     def __repr__(self):
-        return f"|{self.initial}>{self.target}|"
+        return f"|{self.current():.2f}|"

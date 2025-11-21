@@ -28,10 +28,18 @@ tempo(130)
 # S(combo) * 4 >> 3
 
 
+# while True:
+#     S(BD, +BD, (BD, [BD, BD, _, _]), (+BD, [+BD, (BD, [BD, BD])])) * 4 >> tanz
+#     S(HH, [OH, (HH, [HH, HH])], +HH, [OH, HH], (HH, HH, [HH, HH, HH]), [OH, HH], +HH, OH) * 4 >> tanz
+#     S(_, {CL, SD}, ((_, -SD), [_, _, -CL, ]), {CL, SD}) * 4 >> tanz
+#     play()
+
+
+funcc = T(0, 127, .25)
+
 while True:
-    S(BD, +BD, (BD, [BD, BD, _, _]), (+BD, [+BD, (BD, [BD, BD])])) * 4 >> tanz
-    S(HH, [OH, (HH, [HH, HH])], +HH, [OH, HH], (HH, HH, [HH, HH, HH]), [OH, HH], +HH, OH) * 4 >> tanz
-    S(_, {CL, SD}, ((_, -SD), [_, _, -CL, ]), {CL, SD}) * 4 >> tanz
+    print(funcc)
+    S(BD, BD, BD, CC42(funcc)) >> tanz
     play()
 
 
