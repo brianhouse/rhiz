@@ -6,11 +6,11 @@ from .tween import Tween
 
 class Stem():
 
-    def __init__(self, pattern, rate, f):
+    def __init__(self, pattern, f):
         self.channel = 1
         self.repeat = 1
         self.pattern = Pattern(pattern)
-        self.rate = rate
+        self.rate = 1
         self.f = f
         self.cycles = 0
         self.index = -1
@@ -55,6 +55,10 @@ class Stem():
                 self._handle_step(substep)
         else:
             raise Exception(f"Got an unexpected step ({step})")
+
+    def __matmul__(self, rate):
+        self.rate = rate
+        return self
 
     def __mul__(self, repeat):
         assert isinstance(repeat, int)

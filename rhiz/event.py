@@ -55,7 +55,7 @@ class Control():
         self.value = value
 
     def send(self, channel, value):
-        send_control(channel, self.control, int(value))
+        send_control(channel, self.control, round(value))
 
     def __repr__(self):
         return f"{self.control}:{self.value}"

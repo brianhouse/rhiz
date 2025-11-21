@@ -8,11 +8,11 @@ from random import random
 
 class Tween():
 
-    def __init__(self, initial, target, rate, f=linear(), osc=False, saw=False):
+    def __init__(self, initial, target, f=linear(), osc=False, saw=False):
         self.initial = initial
         self.target = target
         assert type(self.initial) is type(self.target)
-        self.rate = rate
+        self.rate = 1
         self.f = f
         self.osc = osc
         self.saw = saw
@@ -51,5 +51,10 @@ class Tween():
                 raise Exception(f"Unknown Tween type ({type(self.target)}) {self.target}")
         return self._current
 
+    def __matmul__(self, rate):
+        self.rate = rate
+        return self
+
     def __repr__(self):
         return f"|{self.current():.2f}|"
+

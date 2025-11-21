@@ -35,11 +35,11 @@ tempo(130)
 #     play()
 
 
-funcc = T(0, 127, .25)
+funcc = T(0, 127) @ .25
 
 while True:
     print(funcc)
-    S(BD, BD, BD, CC42(funcc)) >> tanz
+    S(BD, BD, BD, CC42(funcc)) @ 2 >> tanz
     play()
 
 

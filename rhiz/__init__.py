@@ -13,13 +13,13 @@ class Player():
         self.tweens = []
         self.rate = 1.0
 
-    def add_stem(self, *pattern, rate=1.0, f=None):
-        stem = Stem(pattern, rate, f)
+    def add_stem(self, *pattern, f=None):
+        stem = Stem(pattern, f)
         self.stems.append(stem)
         return stem
 
-    def add_tween(self, initial, target, rate=1.0, f=linear(), osc=False, saw=False):
-        tween = Tween(initial, target, rate, f, osc, saw)
+    def add_tween(self, initial, target, f=linear(), osc=False, saw=False):
+        tween = Tween(initial, target, f, osc, saw)
         self.tweens.append(tween)
         return tween
 
