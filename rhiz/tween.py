@@ -8,12 +8,14 @@ from random import random
 
 class Tween():
 
-    def __init__(self, initial, target, f=linear(), osc=False, saw=False):
+    def __init__(self, initial, target, osc=False, saw=False):
         self.initial = initial
         self.target = target
         assert type(self.initial) is type(self.target)
+        self.repeat = 1
         self.rate = 1
-        self.f = f
+        self.phase = 0
+        self.f = linear()
         self.osc = osc
         self.saw = saw
         self.cycles = 0
@@ -22,7 +24,7 @@ class Tween():
 
     def update(self, delta_t):
         self.cycles += delta_t * self.rate * rhiz.player.rate
-        if self.cycles > 1:
+        if self.cycles >= self.repeat:
             if self.saw:
                 self.cycles = 0
             elif self.osc:
@@ -32,7 +34,7 @@ class Tween():
                 self.cycles = 0
             else:
                 return True
-        self.pos = self.cycles % 1.0
+        self.pos = (self.cycles + self.phase) % 1.0
         self.pos = self.f(self.pos)
         self._current = None
         return False
@@ -41,6 +43,8 @@ class Tween():
         if not self._current:
             if isinstance(self.target, int) or isinstance(self.target, float):
                 self._current = (self.pos * (self.target - self.initial)) + self.initial
+                if isinstance(self.target, int):
+                    self._current = round(self._current)
             elif isinstance(self.target, Note):
                 self._current = self.initial if random() > self.pos else self.target
             elif isinstance(self.target, types.FunctionType):
@@ -55,6 +59,20 @@ class Tween():
         self.rate = rate
         return self
 
+    def __mul__(self, value):
+        if isinstance(value, int):
+            self.repeat = value
+        elif isinstance(value, types.FunctionType):
+            self.f = value
+        else:
+            raise Exception("Unknown multiplier")
+        return self
+
+    def __mod__(self, phase):
+        assert isinstance(phase, float) or isinstance(phase, int) and 0 <= phase <= 1
+        self.phase = phase
+        return self
+
     def __repr__(self):
-        return f"|{self.current():.2f}|"
+        return f"|{self.current()}|"
 

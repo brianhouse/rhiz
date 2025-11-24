@@ -37,9 +37,9 @@ tempo(130)
 
 funcc = T(0, 127) @ .25
 
+
 while True:
-    print(funcc)
-    S(BD, BD, BD, CC42(funcc)) @ 2 >> tanz
+    S(BD, BD, BD, CC42(funcc)) * ease_out(3) @ 2.0 % 0 >> tanz
     play()
 
 

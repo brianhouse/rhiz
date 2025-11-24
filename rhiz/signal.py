@@ -19,30 +19,27 @@ def ease_in(exp=2):
 def ease_out(exp=3):
     def f(pos):
         pos = clamp(pos)
-        return (pos - 1)**exp + 1
+        return 1 - (1 - pos)**exp
     return f
 
 
 def ease_in_out(exp=3):
     def f(pos):
         pos = clamp(pos)
-        pos *= 2
-        if pos < 1:
-            return 0.5 * pos**exp
-        pos -= 2
-        return 0.5 * (pos**exp + 2)
+        if pos < 0.5:
+            return 0.5 * (2 * pos)**exp
+        else:
+            return 1 - 0.5 * (2 * (1 - pos))**exp
     return f
 
 
 def ease_out_in(exp=3):
     def f(pos):
         pos = clamp(pos)
-        pos *= 2
-        pos = pos - 1
-        if pos < 2:
-            return 0.5 * pos**exp + 0.5
+        if pos < 0.5:
+            return 0.5 * (1 - (1 - 2 * pos)**exp)
         else:
-            return 1.0 - (0.5 * pos**exp + 0.5)
+            return 0.5 + 0.5 * ((2 * pos - 1)**exp)
     return f
 
 
