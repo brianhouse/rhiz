@@ -21,6 +21,14 @@ class Note():
     def __invert__(self):
         return notes[f"{self.name}_OFF"]
 
+    def __lshift__(self, value):
+        print("anticipate", value, "tatums")
+        return self
+
+    def __rrshift__(self, value):
+        print("delay", value, "tatums")
+        return self
+
     def __repr__(self):
         return (self.name if not self.ghost else f"-{self.name}") if not self.accent else f"+{self.name}"
 

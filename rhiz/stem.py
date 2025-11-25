@@ -76,7 +76,7 @@ class Stem():
         self.phase = phase
         return self
 
-    def __rshift__(self, channel):
+    def __or__(self, channel):
         assert isinstance(channel, int) and channel > 0 and channel < 16
         self.channel = channel
         return self
