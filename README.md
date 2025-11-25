@@ -25,17 +25,14 @@ Are arbitrary functions executed?
     Comparisons (<, >, ==, !=) also overloadable but must return booleans to be sane.
 
 
-oh snap!
+/
 
-S(C, C) * 4 * ease_in ==> ease in over 4 cycles
-S(C, C) * ease_in * 4 ==> each cycle ease_in, repeat 4 times
+https://chatgpt.com/c/6924d93d-a904-8325-ae1e-59fc68d4586a
 
-so this does make sense to have separate. 
+3>BD hit is late by 3 tatums
+BD<3 hit is early by 3 tatums
 
-
-
-BD>3 and BD<3 to show pushing it in some direction by some amount
-
+use => to send to channel
 
 //
 

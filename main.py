@@ -39,8 +39,11 @@ funcc = T(0, 127) @ .25
 
 
 while True:
-    S(BD, BD, BD, CC42(funcc)) * ease_out(3) @ 2.0 % 0 >> tanz
+    S(BD, BD, BD, BD) * 4 * ease_out(3) >> tanz
+    S(SD, SD, SD, SD) * 4 >> tanz
     play()
+    print()
+    print()
 
 
 # while True:

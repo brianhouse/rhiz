@@ -18,14 +18,18 @@ class Stem():
         self.cycles = 0
         self.index = -1
         self.last_edge = 0
+        self.post_sig = False
         self.steps = [_]
 
     def update(self, delta_t):
         self.cycles += delta_t * self.rate * rhiz.player.rate
         if self.cycles >= self.repeat:
             return True
-        pos = (self.cycles + self.phase) % 1.0
-        pos = self.f(pos)
+        self.cycles += self.phase
+        if self.post_sig:
+            pos = (self.f(self.cycles / self.repeat) * self.repeat) % 1.0
+        else:
+            pos = self.f(self.cycles % 1.0)
         i = int(pos * len(self.steps))
         if i != self.index or (len(self.steps) == 1 and int(self.cycles) != self.last_edge):  # contingency for whole notes
             self.index = (self.index + 1) % len(self.steps)  # dont skip steps
@@ -61,6 +65,8 @@ class Stem():
             self.repeat = value
         elif isinstance(value, types.FunctionType):
             self.f = value
+            if self.repeat > 1:
+                self.post_sig = True
         else:
             raise Exception("Unknown multiplier")
         return self
