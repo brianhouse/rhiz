@@ -4,6 +4,7 @@ from .pattern import Pattern
 from .signal import linear
 from .event import Note, Control, _
 from .tween import Tween
+from .config import config
 
 
 class Stem():
@@ -19,7 +20,7 @@ class Stem():
         self.index = -1
         self.last_edge = 0
         self.post_sig = False
-        self.steps = [_]
+        self.steps = self.pattern.resolve()
 
     def update(self, delta_t):
         self.cycles += delta_t * self.rate * rhiz.player.rate
@@ -30,12 +31,17 @@ class Stem():
             pos = (self.f(self.cycles / self.repeat) * self.repeat) % 1.0
         else:
             pos = self.f(self.cycles % 1.0)
-        i = int(pos * len(self.steps))
+        tatums = [s / len(self.steps) + (-config['tatum'] * .001 * step.tatums * self.rate * rhiz.player.rate) for s, step in enumerate(self.steps)]
+        finder = sorted(tatums)
+        t = 0
+        while t < len(finder) and finder[t] < pos:
+            t += 1
+        t -= 1
+        i = tatums.index(finder[t])
         if i != self.index or (len(self.steps) == 1 and int(self.cycles) != self.last_edge):  # contingency for whole notes
             self.index = (self.index + 1) % len(self.steps)  # dont skip steps
             if self.index == 0:
                 self.steps = self.pattern.resolve()  # new patterns kick in here
-                print(self.steps)
             self._handle_step(self.steps[self.index])
         self.last_edge = int(self.cycles)
         return False

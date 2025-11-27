@@ -5,12 +5,13 @@ from random import randint
 
 class Note():
 
-    def __init__(self, name, n, accent=False, ghost=False, off=False):
+    def __init__(self, name, n, accent=False, ghost=False, off=False, tatums=0):
         self.name = name
         self.n = n
         self.accent = accent
         self.ghost = ghost
         self.off = off
+        self.tatums = tatums
 
     def __pos__(self):
         return notes[f"{self.name}_ACCENT"]
@@ -22,12 +23,10 @@ class Note():
         return notes[f"{self.name}_OFF"]
 
     def __lshift__(self, value):
-        print("anticipate", value, "tatums")
-        return self
+        return Note(self.name, self.n, self.accent, self.ghost, self.off, value)
 
     def __rrshift__(self, value):
-        print("delay", value, "tatums")
-        return self
+        return Note(self.name, self.n, self.accent, self.ghost, self.off, -value)
 
     def __repr__(self):
         return (self.name if not self.ghost else f"-{self.name}") if not self.accent else f"+{self.name}"
@@ -66,7 +65,7 @@ class Control():
         send_control(channel, self.control, round(value))
 
     def __repr__(self):
-        return f"{self.control}:{self.value}"
+        return f"CC{self.control}({self.value})"
 
 
 class ControlFactory():
